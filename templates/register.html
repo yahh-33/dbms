@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Register - Sports Equipment System{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="form-card">
+        <div class="section-title">
+            <div>
+                <p class="eyebrow">Create account</p>
+                <h2>Student Registration</h2>
+            </div>
+        </div>
+
+        <p class="form-description">Fill in your details below to join the sports equipment system.</p>
+
+        <form method="POST" action="/register" class="form-row">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+
+            <label for="confirm_password">Confirm Password</label>
+            <input type="password" id="confirm_password" name="confirm_password" required>
+
+            <label for="department">Department</label>
+            <input type="text" id="department" name="department" required>
+
+            <label for="year">Year</label>
+            <input type="number" id="year" name="year" min="1" max="4" required>
+
+            <label for="contact">Contact</label>
+            <input type="tel" id="contact" name="contact" required>
+
+            <button type="submit" class="btn btn-primary">Register</button>
+        </form>
+
+        <p class="form-note">Already have an account? <a href="/login">Login here</a></p>
+    </div>
+</section>
+{% endblock %}

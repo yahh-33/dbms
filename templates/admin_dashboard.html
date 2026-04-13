@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        h3 {
+            color: #555;
+            margin-top: 30px;
+        }
+        .navbar {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        .navbar a {
+            background-color: #f44336;
+            color: white;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .navbar a:hover {
+            background-color: #da190b;
+        }
+        .form-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .form-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        label {
+            font-weight: bold;
+            min-width: 100px;
+        }
+        input[type="text"],
+        input[type="number"] {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            flex: 1;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+            font-weight: bold;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .reports-link {
+            text-align: center;
+        }
+        .reports-link a {
+            background-color: #008CBA;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        .reports-link a:hover {
+            background-color: #007399;
+        }
+        .alert-section {
+            background-color: #ffebee;
+            border: 2px solid #f44336;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            animation: pulse 2s infinite;
+        }
+        .alert-section h3 {
+            color: #f44336;
+            margin-top: 0;
+            text-align: center;
+        }
+        .overdue-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .overdue-item {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #f44336;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .overdue-header {
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        .overdue-details {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.4;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(244, 67, 54, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(244, 67, 54, 0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <a href="/logout">Logout</a>
+</div>
+
+<h2>Admin Dashboard</h2>
+
+<!-- Overdue Items Alert -->
+{% if overdue_items %}
+<div class="alert-section">
+    <h3 style="color: #f44336;">⚠️ OVERDUE ITEMS - IMMEDIATE ATTENTION REQUIRED</h3>
+    <div style="margin-bottom: 15px;">
+        <a href="/send_overdue_notifications" style="background-color: #f44336; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;">📧 Send Notification Emails</a>
+    </div>
+    <div class="overdue-container">
+        {% for item in overdue_items %}
+        <div class="overdue-item">
+            <div class="overdue-header">
+                <strong>{{ item[3] }}</strong> borrowed by <span style="color: #2196F3; font-weight: bold;">{{ item[1] }}</span>
+            </div>
+            <div class="overdue-details">
+                Issue Date: {{ item[4].strftime('%Y-%m-%d %H:%M') if item[4] else 'N/A' }}<br>
+                Days Overdue: <span style="color: #f44336; font-weight: bold;">{{ item[6] }} days</span><br>
+                Hours Elapsed: {{ item[5] }} hours<br>
+                Email: <span style="color: #666;">{{ item[2] }}</span><br>
+                Fine Accumulating: ₹{{ item[8] if item[8] else 0 }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<div class="form-section">
+    <h3>Add Equipment</h3>
+    <form method="POST" action="/add_equipment">
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div class="form-group">
+            <label for="qty">Quantity:</label>
+            <input type="number" id="qty" name="qty" min="1" required>
+        </div>
+        <button type="submit">Add Equipment</button>
+    </form>
+</div>
+
+<h3>Equipment List</h3>
+{% if equipment %}
+<table>
+    <thead>
+        <tr>
+            <th>Equipment Name</th>
+            <th>Total Quantity</th>
+            <th>Available</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for e in equipment %}
+        <tr>
+            <td>{{ e[1] }}</td>
+            <td>{{ e[2] }}</td>
+            <td>{{ e[3] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No equipment in the system.</p>
+{% endif %}
+
+<h3>All Transactions</h3>
+{% if logs %}
+<table>
+    <thead>
+        <tr>
+            <th>User Name</th>
+            <th>Equipment</th>
+            <th>Issue Date</th>
+            <th>Return Date</th>
+            <th>Status</th>
+            <th>Fine Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for t in logs %}
+        <tr>
+            <td><strong>{{ t[1] }}</strong></td>
+            <td>{{ t[2] }}</td>
+            <td>{{ t[3].strftime('%Y-%m-%d %H:%M') if t[3] else 'N/A' }}</td>
+            <td>{{ t[4].strftime('%Y-%m-%d %H:%M') if t[4] else 'N/A' }}</td>
+            <td>
+                {% if t[5] == 'issued' %}
+                    <span style="background-color: #4CAF50; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold;">BORROWED</span>
+                {% elif t[5] == 'late' %}
+                    <span style="background-color: #f44336; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold;">LATE</span>
+                {% else %}
+                    <span style="background-color: #2196F3; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold;">RETURNED</span>
+                {% endif %}
+            </td>
+            <td><strong>₹{{ t[6] if t[6] else 0 }}</strong></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No transactions yet.</p>
+{% endif %}
+
+<h3>Late Returns Summary</h3>
+{% if late_returns %}
+<table>
+    <thead>
+        <tr>
+            <th>User Name</th>
+            <th>Equipment</th>
+            <th>Issue Date</th>
+            <th>Return Date</th>
+            <th>Days Borrowed</th>
+            <th>Fine Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for lr in late_returns %}
+        <tr style="background-color: #ffebee;">
+            <td><strong>{{ lr[1] }}</strong></td>
+            <td>{{ lr[3] }}</td>
+            <td>{{ lr[4].strftime('%Y-%m-%d %H:%M') if lr[4] else 'N/A' }}</td>
+            <td>{{ lr[5].strftime('%Y-%m-%d %H:%M') if lr[5] else 'N/A' }}</td>
+            <td><span style="color: #f44336; font-weight: bold;">{{ lr[7] }} days</span></td>
+            <td><strong style="color: #f44336;">₹{{ lr[6] if lr[6] else 0 }}</strong></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No late returns at this time.</p>
+{% endif %}
+
+<div class="reports-link">
+    <a href="/reports">View Reports</a>
+</div>
+
+</body>
+</html>

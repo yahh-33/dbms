@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reports</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        h3 {
+            color: #555;
+            margin-top: 30px;
+        }
+        .navbar {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        .navbar a {
+            background-color: #f44336;
+            color: white;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .navbar a:hover {
+            background-color: #da190b;
+        }
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            flex: 1;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+            font-weight: bold;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .empty-message {
+            text-align: center;
+            color: #999;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <a href="/admin_dashboard">Back to Dashboard</a>
+</div>
+
+<h2>Reports & Analytics</h2>
+
+<div class="stats">
+    <div class="stat-card">
+        <div class="stat-number">{{ total_transactions }}</div>
+        <div class="stat-label">Total Transactions</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">{{ active_borrowings }}</div>
+        <div class="stat-label">Active Borrowings</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">{{ late|length }}</div>
+        <div class="stat-label">Late Returns</div>
+    </div>
+</div>
+
+<h3>Most Used Equipment</h3>
+{% if most_used %}
+<table>
+    <thead>
+        <tr>
+            <th>Equipment Name</th>
+            <th>Usage Count</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for m in most_used %}
+        <tr>
+            <td>{{ m[0] }}</td>
+            <td>{{ m[1] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="empty-message">No equipment usage data available.</div>
+{% endif %}
+
+<h3>Late Returns</h3>
+{% if late %}
+<table>
+    <thead>
+        <tr>
+            <th>Student Name</th>
+            <th>Equipment Name</th>
+            <th>Fine Amount</th>
+            <th>Expected Return</th>
+            <th>Actual Return</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for l in late %}
+        <tr>
+            <td>{{ l[0] }}</td>
+            <td>{{ l[1] }}</td>
+            <td>₹{{ l[2] if l[2] else 0 }}</td>
+            <td>{{ l[3].strftime('%Y-%m-%d %H:%M') if l[3] else 'N/A' }}</td>
+            <td>{{ l[4].strftime('%Y-%m-%d %H:%M') if l[4] else 'N/A' }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="empty-message">No late returns recorded.</div>
+{% endif %}
+
+</body>
+</html>

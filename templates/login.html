@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Sports Equipment System{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="form-card">
+        <div class="section-title">
+            <div>
+                <p class="eyebrow">Sign in</p>
+                <h2>Login to your account</h2>
+            </div>
+        </div>
+
+        <p class="form-description">Enter your email and password to access the dashboard.</p>
+
+        <form method="POST" action="/login" class="form-row">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+
+            <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+
+        <p class="form-note">New user? <a href="/register">Create an account</a></p>
+    </div>
+</section>
+{% endblock %}
