@@ -1,16 +1,43 @@
 {% extends "base.html" %}
 
-{% block title %}Home - Sports Equipment System{% endblock %}
+{% block title %}Home - SportsGear{% endblock %}
 
 {% block content %}
 <section class="hero">
-    <div class="hero-card">
-        <p class="eyebrow">Welcome</p>
-        <h1>Sports Equipment Management</h1>
-        <p class="hero-description">Borrow equipment, track returns, monitor fines, and manage inventory with a polished and responsive student and admin experience.</p>
+    <div class="hero-content">
+        <span class="eyebrow">⚡ Next-Gen Campus Platform</span>
+        <h1>Equip your game,<br><span class="gradient-text">master your play.</span></h1>
+        <p class="hero-description">Experience the fastest way to browse, reserve, and borrow university sports equipment. Built with a premium, robust backend to keep you moving without friction.</p>
+
         <div class="hero-actions">
-            <a href="/login" class="btn btn-primary">Login</a>
-            <a href="/register" class="btn btn-secondary">Register</a>
+            {% if session.get('user_id') %}
+                {% if session.get('role') == 'admin' %}
+                    <a href="/admin_dashboard" class="btn btn-primary">Go to Dashboard</a>
+                {% else %}
+                    <a href="/student_dashboard" class="btn btn-primary">Go to Dashboard</a>
+                {% endif %}
+            {% else %}
+                <a href="/register" class="btn btn-primary">Get Started Now</a>
+                <a href="/login" class="btn btn-secondary">Sign In</a>
+            {% endif %}
+        </div>
+
+        <div class="hero-features">
+            <div class="feature-card">
+                <div class="feature-icon">🏃</div>
+                <h3>Quick Borrowing</h3>
+                <p>Scan availability instantly and issue items in seconds without the paperwork.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📅</div>
+                <h3>Smart Reservations</h3>
+                <p>Book equipment ahead of time and never wait in line for what you need.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔔</div>
+                <h3>Auto-Reminders</h3>
+                <p>Get notified when items are due to avoid penalties and keep the cycle flowing.</p>
+            </div>
         </div>
     </div>
 </section>

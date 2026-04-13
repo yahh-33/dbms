@@ -1,295 +1,186 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Admin Dashboard</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        h2 {
-            text-align: center;
-            color: #333;
-        }
-        h3 {
-            color: #555;
-            margin-top: 30px;
-        }
-        .navbar {
-            text-align: right;
-            margin-bottom: 20px;
-        }
-        .navbar a {
-            background-color: #f44336;
-            color: white;
-            padding: 10px 15px;
-            text-decoration: none;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-        .navbar a:hover {
-            background-color: #da190b;
-        }
-        .form-section {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-        .form-group {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        label {
-            font-weight: bold;
-            min-width: 100px;
-        }
-        input[type="text"],
-        input[type="number"] {
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-            flex: 1;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background-color: #4CAF50;
-            color: white;
-            font-weight: bold;
-        }
-        tr:hover {
-            background-color: #f5f5f5;
-        }
-        .reports-link {
-            text-align: center;
-        }
-        .reports-link a {
-            background-color: #008CBA;
-            color: white;
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 4px;
-            font-weight: bold;
-            display: inline-block;
-        }
-        .reports-link a:hover {
-            background-color: #007399;
-        }
-        .alert-section {
-            background-color: #ffebee;
-            border: 2px solid #f44336;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 30px;
-            animation: pulse 2s infinite;
-        }
-        .alert-section h3 {
-            color: #f44336;
-            margin-top: 0;
-            text-align: center;
-        }
-        .overdue-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-        .overdue-item {
-            background: white;
-            padding: 15px;
-            border-radius: 6px;
-            border-left: 4px solid #f44336;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .overdue-header {
-            font-size: 16px;
-            margin-bottom: 8px;
-            color: #333;
-        }
-        .overdue-details {
-            font-size: 14px;
-            color: #666;
-            line-height: 1.4;
-        }
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(244, 67, 54, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(244, 67, 54, 0); }
-        }
-    </style>
-</head>
-<body>
+{% extends "base.html" %}
 
-<div class="navbar">
-    <a href="/logout">Logout</a>
-</div>
+{% block title %}Admin Dashboard - SportsGear{% endblock %}
 
-<h2>Admin Dashboard</h2>
-
-<!-- Overdue Items Alert -->
-{% if overdue_items %}
-<div class="alert-section">
-    <h3 style="color: #f44336;">⚠️ OVERDUE ITEMS - IMMEDIATE ATTENTION REQUIRED</h3>
-    <div style="margin-bottom: 15px;">
-        <a href="/send_overdue_notifications" style="background-color: #f44336; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;">📧 Send Notification Emails</a>
+{% block content %}
+<div class="section-header">
+    <div>
+        <h1 style="font-size: 2rem;">Admin Dashboard</h1>
+        <p class="section-sub">Manage inventory, monitor active transactions, and track overdue items.</p>
     </div>
-    <div class="overdue-container">
-        {% for item in overdue_items %}
-        <div class="overdue-item">
-            <div class="overdue-header">
-                <strong>{{ item[3] }}</strong> borrowed by <span style="color: #2196F3; font-weight: bold;">{{ item[1] }}</span>
-            </div>
-            <div class="overdue-details">
-                Issue Date: {{ item[4].strftime('%Y-%m-%d %H:%M') if item[4] else 'N/A' }}<br>
-                Days Overdue: <span style="color: #f44336; font-weight: bold;">{{ item[6] }} days</span><br>
-                Hours Elapsed: {{ item[5] }} hours<br>
-                Email: <span style="color: #666;">{{ item[2] }}</span><br>
-                Fine Accumulating: ₹{{ item[8] if item[8] else 0 }}
-            </div>
-        </div>
-        {% endfor %}
+    <div style="display:flex;gap:.75rem;flex-wrap:wrap;">
+        <a href="/seed_demo" class="btn btn-secondary"
+           onclick="return confirm('This will clear all student accounts and re-seed fresh demo data with cricket, football, and other sports gear.\n\nProceed?');">
+            🎲 Seed Demo Data
+        </a>
+        <a href="/reports" class="btn btn-secondary">📊 Analytics</a>
     </div>
 </div>
-{% endif %}
 
-<div class="form-section">
-    <h3>Add Equipment</h3>
-    <form method="POST" action="/add_equipment">
+<!-- ADD EQUIPMENT MODULE -->
+<div class="admin-add-row">
+    <div>
+        <h3 style="margin-bottom: .25rem;">Add New Equipment</h3>
+        <p style="font-size: .85rem; color: var(--muted);">Register new sports gear into the inventory system.</p>
+    </div>
+    <form action="/add_equipment" method="POST" style="display:flex;gap:1rem;flex:1;align-items:flex-end;">
         <div class="form-group">
-            <label for="name">Name:</label>
-            <input type="text" id="name" name="name" required>
+            <label for="name">Equipment Name</label>
+            <input type="text" id="name" name="name" placeholder="e.g. Basketball" required>
         </div>
-        <div class="form-group">
-            <label for="qty">Quantity:</label>
-            <input type="number" id="qty" name="qty" min="1" required>
+        <div class="form-group" style="max-width: 150px;">
+            <label for="qty">Quantity</label>
+            <input type="number" id="qty" name="qty" min="1" placeholder="10" required>
         </div>
-        <button type="submit">Add Equipment</button>
+        <button type="submit" class="btn btn-success" style="padding-left:1.8rem;padding-right:1.8rem;margin-bottom:1.15rem;">+ Add Items</button>
     </form>
 </div>
 
-<h3>Equipment List</h3>
-{% if equipment %}
-<table>
-    <thead>
-        <tr>
-            <th>Equipment Name</th>
-            <th>Total Quantity</th>
-            <th>Available</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for e in equipment %}
-        <tr>
-            <td>{{ e[1] }}</td>
-            <td>{{ e[2] }}</td>
-            <td>{{ e[3] }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% else %}
-<p>No equipment in the system.</p>
-{% endif %}
-
-<h3>All Transactions</h3>
-{% if logs %}
-<table>
-    <thead>
-        <tr>
-            <th>User Name</th>
-            <th>Equipment</th>
-            <th>Issue Date</th>
-            <th>Return Date</th>
-            <th>Status</th>
-            <th>Fine Amount</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for t in logs %}
-        <tr>
-            <td><strong>{{ t[1] }}</strong></td>
-            <td>{{ t[2] }}</td>
-            <td>{{ t[3].strftime('%Y-%m-%d %H:%M') if t[3] else 'N/A' }}</td>
-            <td>{{ t[4].strftime('%Y-%m-%d %H:%M') if t[4] else 'N/A' }}</td>
-            <td>
-                {% if t[5] == 'issued' %}
-                    <span style="background-color: #4CAF50; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold;">BORROWED</span>
-                {% elif t[5] == 'late' %}
-                    <span style="background-color: #f44336; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold;">LATE</span>
-                {% else %}
-                    <span style="background-color: #2196F3; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold;">RETURNED</span>
-                {% endif %}
-            </td>
-            <td><strong>₹{{ t[6] if t[6] else 0 }}</strong></td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% else %}
-<p>No transactions yet.</p>
-{% endif %}
-
-<h3>Late Returns Summary</h3>
-{% if late_returns %}
-<table>
-    <thead>
-        <tr>
-            <th>User Name</th>
-            <th>Equipment</th>
-            <th>Issue Date</th>
-            <th>Return Date</th>
-            <th>Days Borrowed</th>
-            <th>Fine Amount</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for lr in late_returns %}
-        <tr style="background-color: #ffebee;">
-            <td><strong>{{ lr[1] }}</strong></td>
-            <td>{{ lr[3] }}</td>
-            <td>{{ lr[4].strftime('%Y-%m-%d %H:%M') if lr[4] else 'N/A' }}</td>
-            <td>{{ lr[5].strftime('%Y-%m-%d %H:%M') if lr[5] else 'N/A' }}</td>
-            <td><span style="color: #f44336; font-weight: bold;">{{ lr[7] }} days</span></td>
-            <td><strong style="color: #f44336;">₹{{ lr[6] if lr[6] else 0 }}</strong></td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% else %}
-<p>No late returns at this time.</p>
-{% endif %}
-
-<div class="reports-link">
-    <a href="/reports">View Reports</a>
+<div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('inventory')">📦 Inventory</button>
+    <button class="tab-btn" onclick="switchTab('logs')">📋 Transaction Logs</button>
+    <button class="tab-btn" onclick="switchTab('overdue')">🚨 Overdue Items ({{ overdue_items|length }})</button>
 </div>
 
-</body>
-</html>
+<!-- ================= INVENTORY ================= -->
+<div id="tab-inventory" class="tab-panel active">
+    {% if equipment %}
+    <div class="table-wrapper">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Equipment Name</th>
+                    <th>Total Stock</th>
+                    <th>Available</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for e in equipment %}
+                <tr>
+                    <td style="color:var(--muted);">#{{ e.id }}</td>
+                    <td><strong>{{ e.name }}</strong></td>
+                    <td>{{ e.total_qty }} units</td>
+                    <td>
+                        <span style="color: {{ '#6ee7b7' if e.available_qty > 0 else '#fca5a5' }}">{{ e.available_qty }} units</span>
+                    </td>
+                    <td>
+                        {% set ratio = e.available_qty / e.total_qty if e.total_qty > 0 else 0 %}
+                        {% if ratio == 0 %}
+                            <span class="badge badge-critical">OUT OF STOCK</span>
+                        {% elif ratio <= 0.3 %}
+                            <span class="badge badge-warn">LOW STOCK</span>
+                        {% else %}
+                            <span class="badge badge-ok">AVAILABLE</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state"><div class="empty-icon">📂</div><h3>No Equipment Found</h3><p>Inventory is empty. Add equipment using the form above.</p></div>
+    {% endif %}
+</div>
+
+<!-- ================= LOGS ================= -->
+<div id="tab-logs" class="tab-panel">
+    {% if logs %}
+    <div class="table-wrapper" style="max-height:600px;overflow-y:auto;">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Equipment</th>
+                    <th>Issue Date</th>
+                    <th>Return Date</th>
+                    <th>Status</th>
+                    <th>Fine</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td>
+                        <div><strong>{{ log.user_name }}</strong></div>
+                        <div style="font-size: .75rem; color: var(--muted-2);">{{ log.email }}</div>
+                    </td>
+                    <td>{{ log.equipment_name }}</td>
+                    <td>{{ log.issue_time[:16] }}</td>
+                    <td>{{ log.return_time[:16] if log.return_time else '-' }}</td>
+                    <td>
+                        {% if log.status == 'issued' %}
+                            <span class="badge badge-warn">ISSUED</span>
+                        {% elif log.status == 'returned' %}
+                            <span class="badge badge-ok">RETURNED</span>
+                        {% elif log.status == 'late' %}
+                            <span class="badge badge-critical">LATE RETURN</span>
+                        {% else %}
+                            <span class="badge badge-full">{{ log.status|upper }}</span>
+                        {% endif %}
+                    </td>
+                    <td><strong style="color:{{ '#f87171' if log.fine > 0 else 'var(--muted)' }}">₹{{ log.fine }}</strong></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state"><div class="empty-icon">📝</div><h3>No Logs</h3><p>No transactions have occurred yet.</p></div>
+    {% endif %}
+</div>
+
+<!-- ================= OVERDUE ================= -->
+<div id="tab-overdue" class="tab-panel">
+    {% if users_with_severe_overdue %}
+    <div style="margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);padding:1rem;border-radius:var(--r-lg);">
+        <div>
+            <h4 style="color:#f87171;margin-bottom:.2rem;">Severe Overdue Accounts Detected</h4>
+            <p style="font-size:.85rem;color:var(--text-2);">{{ users_with_severe_overdue|length }} user(s) have items overdue by more than 7 days.</p>
+        </div>
+        <a href="/send_overdue_notifications" class="btn btn-danger" onclick="return confirm('Send automated warning emails to these users?');">Send Warning Emails</a>
+    </div>
+    {% endif %}
+
+    {% if overdue_items %}
+    <div class="table-wrapper">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Equipment</th>
+                    <th>Days Overdue</th>
+                    <th>Accumulated Fine</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in overdue_items %}
+                <tr>
+                    <td>
+                        <div><strong>{{ item.user_name }}</strong></div>
+                        <div style="font-size: .75rem; color: var(--muted-2);">{{ item.email }}</div>
+                    </td>
+                    <td>{{ item.equipment_name }}</td>
+                    <td><span class="badge badge-overdue">{{ item.days_elapsed - 1 }} Days Late</span></td>
+                    <td><strong style="color:#f87171;">₹{{ item.fine }}</strong> <span style="font-size:.75rem;color:var(--muted);">(approx)</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state"><div class="empty-icon">✅</div><h3>All Clear</h3><p>No currently overdue items! Everyone is returning gear on time.</p></div>
+    {% endif %}
+</div>
+
+<script>
+function switchTab(tabId) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + tabId).classList.add('active');
+    event.currentTarget.classList.add('active');
+}
+</script>
+{% endblock %}

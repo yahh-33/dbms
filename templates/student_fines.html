@@ -1,187 +1,66 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>My Fines - Sports Equipment Management</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        h2 {
-            text-align: center;
-            color: #333;
-        }
-        h3 {
-            color: #555;
-            margin-top: 30px;
-        }
-        .navbar {
-            text-align: right;
-            margin-bottom: 20px;
-        }
-        .navbar a {
-            background-color: #f44336;
-            color: white;
-            padding: 10px 15px;
-            text-decoration: none;
-            border-radius: 4px;
-            font-weight: bold;
-            margin-left: 10px;
-        }
-        .navbar a:hover {
-            background-color: #da190b;
-        }
-        .summary-box {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            text-align: center;
-            margin-bottom: 30px;
-            border-left: 4px solid #f44336;
-        }
-        .summary-box h3 {
-            margin-top: 0;
-            color: #333;
-        }
-        .total-fine {
-            font-size: 36px;
-            color: #f44336;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-        .status-critical {
-            font-size: 18px;
-            color: #f44336;
-            font-weight: bold;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background-color: #f44336;
-            color: white;
-            font-weight: bold;
-        }
-        tr:hover {
-            background-color: #f5f5f5;
-        }
-        .status-badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 12px;
-        }
-        .status-late {
-            background-color: #f44336;
-            color: white;
-        }
-        .fine-amount {
-            color: #f44336;
-            font-weight: bold;
-            font-size: 16px;
-        }
-        .empty-message {
-            text-align: center;
-            color: #4CAF50;
-            padding: 30px;
-            font-size: 18px;
-            font-weight: bold;
-        }
-        .button-container {
-            text-align: center;
-            margin-top: 30px;
-        }
-        .back-button {
-            background-color: #2196F3;
-            color: white;
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 4px;
-            font-weight: bold;
-            display: inline-block;
-        }
-        .back-button:hover {
-            background-color: #0b7dda;
-        }
-        .info-box {
-            background-color: #e3f2fd;
-            border: 1px solid #2196F3;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-            color: #1565c0;
-        }
-    </style>
-</head>
-<body>
+{% extends "base.html" %}
 
-<div class="navbar">
-    <a href="/student_dashboard">Back to Dashboard</a>
-    <a href="/logout">Logout</a>
+{% block title %}My Fines - SportsGear{% endblock %}
+
+{% block content %}
+<div class="section-header">
+    <div>
+        <h1 style="font-size: 2rem;">My Fines & Penalties</h1>
+        <p class="section-sub">A detailed overview of your late returns and incurred penalties.</p>
+    </div>
+    <a href="/student_dashboard" class="btn btn-secondary">← Back to Dashboard</a>
 </div>
 
-<h2>My Fines & Penalties Report</h2>
+{% if total_fine > 0 %}
+<div class="fine-banner" style="margin-bottom: 2rem; max-width: 600px;">
+    <div>
+        <div class="fine-label">Total Outstanding Debt</div>
+        <div class="fine-amount">₹{{ total_fine }}</div>
+    </div>
+    <div style="font-size: .85rem; color: #f87171; background: rgba(239,68,68,.15); padding: 1rem; border-radius: var(--r);">
+        <strong>Action Required:</strong> Visit the sports administration desk to pay your outstanding balance. Further borrowings may be restricted until dues are cleared.
+    </div>
+</div>
+{% else %}
+<div class="empty-state" style="margin-bottom: 2rem;">
+    <div class="empty-icon" style="color:#10b981;">🎉</div>
+    <h3 style="color:#10b981;">You are completely clear!</h3>
+    <p>You have no pending fines. Thank you for returning equipment on time.</p>
+</div>
+{% endif %}
 
+<h3 style="margin-bottom:1rem;">Penalty History</h3>
 {% if fines %}
-    <div class="summary-box">
-        <h3>Total Fines Owed</h3>
-        <div class="total-fine">₹{{ total_fine }}</div>
-        <p class="status-critical">⚠️ Please clear your fines immediately!</p>
-    </div>
-
-    <div class="info-box">
-        <strong>ℹ️ Information:</strong> Fines are calculated at ₹10 per hour for items returned after 24 hours. 
-        Please contact the admin if you have any questions about your fines.
-    </div>
-
-    <h3>Fine Details</h3>
-    <table>
+<div class="table-wrapper">
+    <table class="table">
         <thead>
             <tr>
-                <th>Equipment Name</th>
+                <th>Equipment</th>
                 <th>Issue Date</th>
                 <th>Return Date</th>
                 <th>Status</th>
-                <th>Fine Amount</th>
+                <th>Fine Charged</th>
             </tr>
         </thead>
         <tbody>
             {% for fine in fines %}
             <tr>
-                <td><strong>{{ fine[1] }}</strong></td>
-                <td>{{ fine[2].strftime('%Y-%m-%d %H:%M') if fine[2] else 'N/A' }}</td>
-                <td>{{ fine[3].strftime('%Y-%m-%d %H:%M') if fine[3] else 'N/A' }}</td>
+                <td><strong>{{ fine.name }}</strong></td>
+                <td>{{ fine.issue_time[:16] }}</td>
+                <td>{{ fine.return_time[:16] if fine.return_time else '-' }}</td>
                 <td>
-                    <span class="status-badge status-late">{{ fine[5] if fine[5] == 'late' else 'FINE' }}</span>
+                    <span class="badge badge-critical">{{ fine.status|upper }}</span>
                 </td>
-                <td class="fine-amount">₹{{ fine[4] if fine[4] else 0 }}</td>
+                <td><strong style="color: #f87171;">₹{{ fine.fine if fine.fine else 0 }}</strong></td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-
+</div>
 {% else %}
-    <div class="empty-message">
-        ✓ Excellent! You have no pending fines.<br>
-        Keep up the good work by returning equipment on time!
-    </div>
+<div style="text-align:center; padding:3rem; background:var(--surface); border-radius:var(--r-lg); border:1px solid var(--border-sub);">
+    <p style="color:var(--muted);">No late returns or fines to display.</p>
+</div>
 {% endif %}
 
-<div class="button-container">
-    <a href="/student_dashboard" class="back-button">Back to Dashboard</a>
-</div>
-
-</body>
-</html>
+{% endblock %}

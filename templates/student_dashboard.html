@@ -1,378 +1,285 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Student Dashboard</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        h2 {
-            text-align: center;
-            color: #333;
-        }
-        h3 {
-            color: #555;
-            margin-top: 30px;
-        }
-        .navbar {
-            text-align: right;
-            margin-bottom: 20px;
-        }
-        .navbar a {
-            background-color: #f44336;
-            color: white;
-            padding: 10px 15px;
-            text-decoration: none;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-        .navbar a:hover {
-            background-color: #da190b;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background-color: #4CAF50;
-            color: white;
-            font-weight: bold;
-        }
-        tr:hover {
-            background-color: #f5f5f5;
-        }
-        form {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        .reservation-form {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 8px;
-            align-items: center;
-        }
-        input[type="datetime-local"] {
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-            width: 100%;
-        }
-        button {
-            background-color: #008CBA;
-            color: white;
-            padding: 8px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        button:hover {
-            background-color: #007399;
-        }
-        .empty-message {
-            text-align: center;
-            color: #999;
-            padding: 20px;
-        }
-        .flash-message {
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 4px;
-            text-align: center;
-            font-weight: bold;
-        }
-        .flash-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .flash-error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        .return-btn {
-            background-color: #ff9800;
-            color: white;
-            padding: 6px 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .return-btn:hover {
-            background-color: #e68900;
-        }
-        .urgent {
-            background-color: #ffebee !important;
-            border-left: 4px solid #f44336;
-        }
-        .warning {
-            background-color: #fff3e0 !important;
-            border-left: 4px solid #ff9800;
-        }
-        .normal {
-            background-color: #f5f5f5 !important;
-        }
-        .urgent-text {
-            color: #f44336;
-            font-weight: bold;
-        }
-        .warning-text {
-            color: #ff9800;
-            font-weight: bold;
-        }
-        .normal-text {
-            color: #4CAF50;
-        }
-        .overdue {
-            color: #f44336;
-            font-weight: bold;
-            background-color: #ffcdd2;
-            padding: 2px 6px;
-            border-radius: 3px;
-        }
-        .urgent-status, .warning-status, .normal-status, .overdue-status {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 12px;
-        }
-        .urgent-status {
-            background-color: #f44336;
-            color: white;
-        }
-        .warning-status {
-            background-color: #ff9800;
-            color: white;
-        }
-        .normal-status {
-            background-color: #4CAF50;
-            color: white;
-        }
-        .overdue-status {
-            background-color: #f44336;
-            color: white;
-            animation: blink 1s infinite;
-        }
-        .legend {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-top: 20px;
-        }
-        .legend h4 {
-            margin-top: 0;
-            color: #333;
-        }
-        @keyframes blink {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-    </style>
-    <script>
-        // Auto-refresh the page every 60 seconds to update time remaining
-        setInterval(function() {
-            location.reload();
-        }, 60000);
-    </script>
-</head>
-<body>
+{% extends "base.html" %}
 
-<div class="navbar">
-    <a href="/logout">Logout</a>
+{% block title %}Student Dashboard - SportsGear{% endblock %}
+
+{% block content %}
+<div class="section-header">
+    <div>
+        <h1 style="font-size: 2rem;">Student Dashboard</h1>
+        <p class="section-sub">Manage your sports equipment, track reservations, and view pending fines.</p>
+    </div>
 </div>
 
-<h2>Student Dashboard</h2>
+<div class="stats-grid">
+    <div class="stat-card primary">
+        <span class="stat-label">Active Items</span>
+        <span class="stat-value">{{ borrowed_items|length }}</span>
+        <span class="stat-sub">Currently borrowed</span>
+    </div>
+    <div class="stat-card emerald">
+        <span class="stat-label">Reservations</span>
+        <span class="stat-value">{{ upcoming_reservations|length }}</span>
+        <span class="stat-sub">Upcoming bookings</span>
+    </div>
+    <div class="stat-card {{ 'danger' if total_fine > 0 else '' }}">
+        <span class="stat-label">Pending Fines</span>
+        <span class="stat-value">₹{{ total_fine }}</span>
+        <span class="stat-sub">{{ 'Clear your dues!' if total_fine > 0 else 'All clear!' }}</span>
+    </div>
+</div>
 
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    {% for category, message in messages %}
-      <div class="flash-message flash-{{ 'success' if category == 'message' else 'error' }}">
-        {{ message }}
-      </div>
-    {% endfor %}
+{% if total_fine > 0 %}
+<div class="fine-banner">
+    <div>
+        <div class="fine-label">⚠ Outstanding Fines</div>
+        <div class="fine-amount">₹{{ total_fine }}</div>
+        <div style="font-size:.85rem;color:#f87171;margin-top:.3rem;">Visit the admin desk to clear your dues immediately.</div>
+    </div>
+    <a href="/student_fines" class="btn btn-danger">View Details</a>
+</div>
+{% endif %}
+
+<!-- Overdue alert for active items -->
+{% for item in borrowed_items %}
+  {% if item.hours_remaining is not none and item.hours_remaining <= 0 %}
+    <div class="flash flash-error">
+      ⚠ <strong>{{ item.name }}</strong> is <strong>{{ "%.1f"|format(-item.hours_remaining) }} hours overdue!</strong>
+      Please return it immediately to avoid further fines (₹10/hour).
+    </div>
+  {% elif item.hours_remaining is not none and item.hours_remaining <= 2 %}
+    <div class="flash flash-error" style="background:rgba(245,158,11,.12);color:#fcd34d;border-color:rgba(245,158,11,.25);">
+      ⏳ <strong>{{ item.name }}</strong> is due in <strong>{{ "%.1f"|format(item.hours_remaining) }} hour(s)!</strong> Return it soon.
+    </div>
   {% endif %}
-{% endwith %}
+{% endfor %}
 
-<h3>My Borrowed Items</h3>
-{% if borrowed_items %}
-<table>
-    <thead>
-        <tr>
-            <th>Equipment Name</th>
-            <th>Quantity</th>
-            <th>Issue Date</th>
-            <th>Time Elapsed</th>
-            <th>Time Remaining</th>
-            <th>Status</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for item in borrowed_items %}
-        <tr class="{% if item[6] <= 2 %}urgent{% elif item[6] <= 6 %}warning{% else %}normal{% endif %}">
-            <td>{{ item[1] }}</td>
-            <td>1</td>
-            <td>{{ item[2].strftime('%Y-%m-%d %H:%M') if item[2] else 'N/A' }}</td>
-            <td>{{ item[5] }} hours</td>
-            <td>
-                {% if item[6] > 0 %}
-                    <span class="{% if item[6] <= 2 %}urgent-text{% elif item[6] <= 6 %}warning-text{% else %}normal-text{% endif %}">
-                        {{ "%.1f" | format(item[6]) }} hours left
-                    </span>
-                {% else %}
-                    <span class="overdue">Overdue by {{ "%.1f" | format(-item[6]) }} hours</span>
-                {% endif %}
-            </td>
-            <td>
-                {% if item[6] <= 0 %}
-                    <span class="overdue-status">OVERDUE</span>
-                {% elif item[6] <= 2 %}
-                    <span class="urgent-status">CRITICAL</span>
-                {% elif item[6] <= 6 %}
-                    <span class="warning-status">WARNING</span>
-                {% else %}
-                    <span class="normal-status">OK</span>
-                {% endif %}
-            </td>
-            <td>
-                <a href="/return/{{ item[0] }}" class="return-btn" onclick="return confirm('Are you sure you want to return this item?')">Return</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-<div class="legend">
-    <h4>Status Legend:</h4>
-    <span class="normal-status">● OK</span> - More than 6 hours remaining<br>
-    <span class="warning-status">● WARNING</span> - 2-6 hours remaining<br>
-    <span class="urgent-status">● CRITICAL</span> - Less than 2 hours remaining<br>
-    <span class="overdue">● OVERDUE</span> - Past 24-hour limit
+<div class="tab-bar">
+    <button class="tab-btn active"  id="btn-catalog"      onclick="switchTab('catalog',this)">🛡️ Equipment Catalog</button>
+    <button class="tab-btn"         id="btn-borrowed"     onclick="switchTab('borrowed',this)">🎒 My Borrowed ({{ borrowed_items|length }})</button>
+    <button class="tab-btn"         id="btn-reservations" onclick="switchTab('reservations',this)">📅 Reservations ({{ upcoming_reservations|length }})</button>
 </div>
-{% else %}
-<p class="empty-message">You haven't borrowed any items yet.</p>
-{% endif %}
 
-<h3>Upcoming Reservations</h3>
-{% if upcoming_reservations %}
-<table>
-    <thead>
-        <tr>
-            <th>Equipment</th>
-            <th>Reserved For</th>
-            <th>Status</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for reservation in upcoming_reservations %}
-        <tr>
-            <td>{{ reservation[1] }}</td>
-            <td>{{ reservation[2].strftime('%Y-%m-%d %H:%M') if reservation[2] else 'N/A' }}</td>
-            <td><span class="warning-status">{{ reservation[3].capitalize() }}</span></td>
-            <td>
-                <form action="/cancel_reservation/{{ reservation[0] }}" method="POST" onsubmit="return confirm('Cancel this reservation?');">
-                    <button type="submit" style="background-color:#f44336;">Cancel</button>
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% else %}
-<p class="empty-message">You have no upcoming reservations yet.</p>
-{% endif %}
-
-<h3>My Fines & Penalties</h3>
-{% if user_fines %}
-<div style="background-color: #fff3e0; border: 1px solid #ff9800; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
-    <div style="text-align: center; margin-bottom: 15px;">
-        <p style="margin: 0; color: #333;">Total Fines Owed:</p>
-        <h2 style="margin: 5px 0; color: #f44336;">₹{{ total_fine }}</h2>
-    </div>
-    <table>
-        <thead>
-            <tr>
-                <th>Equipment</th>
-                <th>Issue Date</th>
-                <th>Return Date</th>
-                <th>Status</th>
-                <th>Fine Amount</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for fine in user_fines %}
-            <tr style="background-color: #ffebee;">
-                <td>{{ fine[1] }}</td>
-                <td>{{ fine[4].strftime('%Y-%m-%d %H:%M') if fine[4] else 'N/A' }}</td>
-                <td>{{ fine[2].strftime('%Y-%m-%d %H:%M') if fine[2] else 'N/A' }}</td>
-                <td>
-                    <span style="background-color: #f44336; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold;">{{ fine[3] if fine[3] else 'LATE' }}</span>
-                </td>
-                <td><strong style="color: #f44336;">₹{{ fine[3] if fine[3] else 0 }}</strong></td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <div style="margin-top: 15px; padding: 10px; background-color: white; border-radius: 4px; text-align: center;">
-        <p style="margin: 0; color: #f44336; font-weight: bold;">Please clear your fines as soon as possible!</p>
-        <a href="/student_fines" style="color: #2196F3; text-decoration: none; font-weight: bold;">View Detailed Fines Report »</a>
-    </div>
-</div>
-{% else %}
-<p class="empty-message">✓ You have no pending fines. Great!</p>
-{% endif %}
-
-<h3>Available Equipment</h3>
-
-{% if equipment %}
-<table>
-    <thead>
-        <tr>
-            <th>Equipment Name</th>
-            <th>Total Quantity</th>
-            <th>Available</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
+<!-- ═══════════════════ EQUIPMENT CATALOG ═══════════════════ -->
+<div id="tab-catalog" class="tab-panel active">
+    {% if equipment %}
+    <div class="equipment-grid">
         {% for e in equipment %}
-        <tr>
-            <td>{{ e[1] }}</td>
-            <td>{{ e[2] }}</td>
-            <td>{{ e[3] }}</td>
-            <td>
-                <form action="/issue/{{ e[0] }}" method="POST" style="display:inline-block; margin-bottom:8px;">
-                    <button type="submit">Borrow</button>
-                </form>
-                <form class="reservation-form" action="/reserve/{{ e[0] }}" method="POST">
-                    <input type="datetime-local" name="reservation_time" min="{{ min_datetime }}" required>
-                    <button type="submit" style="background-color:#16a34a;">Reserve</button>
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% else %}
-<p class="empty-message">No equipment available at the moment.</p>
-{% endif %}
+        <div class="equipment-card">
+            <div class="eq-header">
+                <!-- Pick an icon based on name keywords -->
+                {% set nm = e.name | lower %}
+                {% if 'cricket' in nm and 'bat' in nm %}
+                    <div class="eq-icon">🏏</div>
+                {% elif 'cricket' in nm %}
+                    <div class="eq-icon">🔴</div>
+                {% elif 'football' in nm %}
+                    <div class="eq-icon">⚽</div>
+                {% elif 'basket' in nm %}
+                    <div class="eq-icon">🏀</div>
+                {% elif 'badminton' in nm %}
+                    <div class="eq-icon">🏸</div>
+                {% elif 'tennis' in nm and 'table' in nm %}
+                    <div class="eq-icon">🏓</div>
+                {% elif 'tennis' in nm %}
+                    <div class="eq-icon">🎾</div>
+                {% elif 'volley' in nm %}
+                    <div class="eq-icon">🏐</div>
+                {% else %}
+                    <div class="eq-icon">🏅</div>
+                {% endif %}
 
-</body>
-</html>
+                <div>
+                    <div class="eq-name">{{ e.name }}</div>
+                    <div class="eq-avail">
+                        {% if e.available_qty > 0 %}
+                            <div class="avail-dot green"></div>
+                            <span style="color:#6ee7b7;">{{ e.available_qty }}</span> / {{ e.total_qty }} available
+                        {% else %}
+                            <div class="avail-dot red"></div>
+                            <span style="color:#fca5a5;">Out of stock</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Availability progress bar -->
+            {% set pct = (e.available_qty / e.total_qty * 100) if e.total_qty > 0 else 0 %}
+            <div class="bar-track">
+                <div class="bar-fill {{ 'high' if pct > 50 else ('mid' if pct > 0 else 'low') }}"
+                     style="width:{{ pct | int }}%;"></div>
+            </div>
+
+            <div class="eq-actions">
+                <!-- BORROW NOW — system date applied automatically, deadline = NOW + 24 h -->
+                {% if e.available_qty > 0 %}
+                <form action="/issue/{{ e.id }}" method="POST">
+                    <button type="submit" class="btn btn-primary" style="width:100%;">
+                        ⚡ Borrow Now
+                    </button>
+                </form>
+                {% else %}
+                <button class="btn btn-secondary" style="width:100%;opacity:.45;" disabled>Unavailable</button>
+                {% endif %}
+
+                <!-- RESERVE: pick a future date → JS shows return deadline live -->
+                <form action="/reserve/{{ e.id }}" method="POST">
+                    <div class="reserve-row">
+                        <div style="flex:1;">
+                            <input type="datetime-local"
+                                   name="reservation_time"
+                                   min="{{ min_datetime }}"
+                                   id="res-{{ e.id }}"
+                                   onchange="previewReturn('res-{{ e.id }}','hint-{{ e.id }}')"
+                                   required>
+                            <div id="hint-{{ e.id }}"
+                                 style="font-size:.72rem;color:#6ee7b7;margin-top:.3rem;min-height:1rem;"></div>
+                        </div>
+                        <button type="submit" class="btn btn-secondary" style="align-self:flex-start;">Reserve</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <h3>No Equipment Found</h3>
+        <p>There is currently no equipment registered. Ask an admin to add items or run the Demo Seeder.</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- ═══════════════════ MY BORROWED ITEMS ═══════════════════ -->
+<div id="tab-borrowed" class="tab-panel">
+    {% if borrowed_items %}
+    <div class="table-wrapper">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Borrowed At</th>
+                    <th>Deadline (24 h)</th>
+                    <th>Time Elapsed</th>
+                    <th>Time Remaining</th>
+                    <th>Alert</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in borrowed_items %}
+                <tr>
+                    <td><strong>{{ item.name }}</strong></td>
+                    <td>{{ item.issue_time[:16] }}</td>
+                    <td>{{ item.expected_return[:16] if item.expected_return else 'N/A' }}</td>
+                    <td>{{ item.hours_elapsed }} h</td>
+                    <td>
+                        {% if item.hours_remaining is not none %}
+                            {% if item.hours_remaining > 0 %}
+                                <span style="color:{{ '#6ee7b7' if item.hours_remaining > 6 else ('#fbbf24' if item.hours_remaining > 2 else '#fca5a5') }};">
+                                    {{ "%.1f"|format(item.hours_remaining) }} h left
+                                </span>
+                            {% else %}
+                                <span style="color:#f87171;font-weight:700;">
+                                    OVERDUE {{ "%.1f"|format(-item.hours_remaining) }} h
+                                </span>
+                            {% endif %}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if item.hours_remaining is not none %}
+                            {% if item.hours_remaining <= 0 %}
+                                <span class="badge badge-overdue">🚨 OVERDUE</span>
+                            {% elif item.hours_remaining <= 2 %}
+                                <span class="badge badge-critical">🔴 URGENT</span>
+                            {% elif item.hours_remaining <= 6 %}
+                                <span class="badge badge-warn">🟡 DUE SOON</span>
+                            {% else %}
+                                <span class="badge badge-ok">✅ OK</span>
+                            {% endif %}
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="/return/{{ item.id }}" class="btn btn-sm btn-amber"
+                           onclick="return confirm('Return {{ item.name }} now?')">
+                            ↩ Return
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">🎒</div>
+        <h3>Nothing Borrowed</h3>
+        <p>You have no active borrowings. Go to the <a href="#" onclick="switchTab('catalog',document.getElementById('btn-catalog'))" style="color:var(--primary-2);">Equipment Catalog</a> to borrow an item.</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- ═══════════════════ RESERVATIONS ═══════════════════ -->
+<div id="tab-reservations" class="tab-panel">
+    {% if upcoming_reservations %}
+    <div class="table-wrapper">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Equipment</th>
+                    <th>Pick-up Date</th>
+                    <th>Return Deadline</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for res in upcoming_reservations %}
+                <tr>
+                    <td><strong>{{ res.name }}</strong></td>
+                    <td>{{ res.reservation_time[:16] }}</td>
+                    <td>{{ res.expected_return[:16] if res.expected_return else '—' }}</td>
+                    <td><span class="badge badge-reserved">RESERVED</span></td>
+                    <td>
+                        <form action="/cancel_reservation/{{ res.id }}" method="POST"
+                              onsubmit="return confirm('Cancel this reservation?');">
+                            <button type="submit" class="btn btn-sm btn-danger">Cancel</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">📅</div>
+        <h3>No Reservations</h3>
+        <p>Reserve equipment in advance from the catalog tab by selecting a future date.</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+/* Switch tabs */
+function switchTab(name, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    if (btn) btn.classList.add('active');
+}
+
+/* Show return-by preview when reservation datetime is picked */
+function previewReturn(inputId, hintId) {
+    const input = document.getElementById(inputId);
+    const hint  = document.getElementById(hintId);
+    if (!input || !input.value) { if (hint) hint.textContent = ''; return; }
+    const pickup = new Date(input.value);
+    const ret    = new Date(pickup.getTime() + 24 * 3600 * 1000);
+    const opts   = { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' };
+    hint.textContent = '↩ Return by: ' + ret.toLocaleString('en-IN', opts);
+}
+</script>
+{% endblock %}
